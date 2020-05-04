@@ -6,4 +6,10 @@ export default {
     if (!r.ok) throw new Error('Failed to fetch questions');
     return r.json();
   },
+
+  getCategoryQuestions: async (id) => {
+    const r = await fetch(`${API}/category/${id}/questions`).catch(() => ({ ok: false }));
+    if (!r.ok) throw new Error('Failed to fetch questions');
+    return r.json();
+  },
 };

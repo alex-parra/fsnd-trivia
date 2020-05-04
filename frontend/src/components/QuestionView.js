@@ -63,23 +63,17 @@ class QuestionView extends Component {
     return pageNumbers;
   }
 
-  getByCategory = (id) => {
-    $.ajax({
-      url: `/categories/${id}/questions`, //TODO: update request URL
-      type: 'GET',
-      success: (result) => {
-        this.setState({
-          questions: result.questions,
-          totalQuestions: result.total_questions,
-          currentCategory: result.current_category,
-        });
-        return;
-      },
-      error: (error) => {
-        alert('Unable to load questions. Please try your request again');
-        return;
-      },
-    });
+  getByCategory = async (id) => {
+    try {
+      const data = await api.getCategoryQuestions(id);
+      this.setState({
+        questions: data.questions,
+        totalQuestions: data.total_questions,
+        currentCategory: data.current_category,
+      });
+    } catch {
+      alert('Unable to load questions. Please try your request again');
+    }
   };
 
   submitSearch = (searchTerm) => {
