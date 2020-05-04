@@ -24,9 +24,10 @@ class QuestionView extends Component {
   }
 
   getQuestions = async () => {
+    if (this.state.currentCategory) return this.getByCategory(this.state.currentCategory);
+
     try {
       const data = await api.getQuestions(this.state.page);
-      console.log({ data });
       this.setState({
         questions: data.questions,
         totalQuestions: data.total_questions,
@@ -104,19 +105,12 @@ class QuestionView extends Component {
 
   questionAction = (id) => (action) => {
     if (action === 'DELETE') {
-      if (window.confirm('are you sure you want to delete the question?')) {
-        $.ajax({
-          url: `/questions/${id}`, //TODO: update request URL
-          type: 'DELETE',
-          success: (result) => {
-            this.getQuestions();
-          },
-          error: (error) => {
-            alert('Unable to load questions. Please try your request again');
-            return;
-          },
-        });
-      }
+      const confirm = window.confirm('are you sure you want to delete the question?');
+      if (!confirm) return;
+      api
+        .deleteQuestion(id)
+        .then(this.getQuestions)
+        .catch(() => alert('Unable to load questions. Please try your request again'));
     }
   };
 

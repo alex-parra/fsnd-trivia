@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
-from models import setup_db, Question, Category
+from models import setup_db, db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
@@ -24,6 +24,9 @@ def create_app(test_config=None):
                              'GET, POST, PUT, PATCH, DELETE, OPTIONS')
         return response
 
+    '''
+    Get all categories
+    '''
     @app.route('/categories')
     def get_categories():
         categories = Category.query.all()
@@ -32,7 +35,7 @@ def create_app(test_config=None):
         })
 
     '''
-    get_questions returns paginated list of questions
+    Get questions paginated
     '''
     @app.route('/questions')
     def get_questions():
@@ -53,12 +56,16 @@ def create_app(test_config=None):
         })
 
     '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
-
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-  '''
+    Delete a question by it's ID
+    '''
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+        question = Question.query.get(question_id)
+        if question is None:
+            return abort(404)
+        db.session.delete(question)
+        db.session.commit()
+        return jsonify({'success': True})
 
     '''
   @TODO: 
@@ -83,13 +90,8 @@ def create_app(test_config=None):
   '''
 
     '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
+    Get paginated questions of specified category
+    '''
     @app.route('/category/<int:category_id>/questions')
     def get_category_questions(category_id):
         per_page = 10

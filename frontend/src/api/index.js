@@ -7,6 +7,10 @@ export default {
     return r.json();
   },
 
+  deleteQuestion: async (questionId) => {
+    return fetch(`${API}/questions/${questionId}`, { method: 'DELETE' });
+  },
+
   getCategoryQuestions: async (id) => {
     const r = await fetch(`${API}/category/${id}/questions`).catch(() => ({ ok: false }));
     if (!r.ok) throw new Error('Failed to fetch questions');
