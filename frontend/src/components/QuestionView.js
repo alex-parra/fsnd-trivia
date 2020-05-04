@@ -4,6 +4,7 @@ import '../stylesheets/App.css';
 import Question from './Question';
 import Search from './Search';
 import $ from 'jquery';
+import api from '../api';
 
 class QuestionView extends Component {
   constructor() {
@@ -11,6 +12,7 @@ class QuestionView extends Component {
     this.state = {
       questions: [],
       page: 1,
+      perPage: 10,
       totalQuestions: 0,
       categories: {},
       currentCategory: null,
@@ -21,24 +23,21 @@ class QuestionView extends Component {
     this.getQuestions();
   }
 
-  getQuestions = () => {
-    $.ajax({
-      url: `/questions?page=${this.state.page}`, //TODO: update request URL
-      type: 'GET',
-      success: (result) => {
-        this.setState({
-          questions: result.questions,
-          totalQuestions: result.total_questions,
-          categories: result.categories,
-          currentCategory: result.current_category,
-        });
-        return;
-      },
-      error: (error) => {
-        alert('Unable to load questions. Please try your request again');
-        return;
-      },
-    });
+  getQuestions = async () => {
+    try {
+      const data = await api.getQuestions(this.state.page);
+      console.log({ data });
+      this.setState({
+        questions: data.questions,
+        totalQuestions: data.total_questions,
+        page: data.page,
+        perPage: data.per_page,
+        categories: data.categories,
+        currentCategory: data.current_category,
+      });
+    } catch {
+      alert('Unable to load questions. Please try your request again');
+    }
   };
 
   selectPage(num) {
@@ -47,7 +46,7 @@ class QuestionView extends Component {
 
   createPagination() {
     let pageNumbers = [];
-    let maxPage = Math.ceil(this.state.totalQuestions / 10);
+    let maxPage = Math.ceil(this.state.totalQuestions / this.state.perPage);
     for (let i = 1; i <= maxPage; i++) {
       pageNumbers.push(
         <span

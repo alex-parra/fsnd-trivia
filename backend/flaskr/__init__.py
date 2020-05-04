@@ -8,40 +8,51 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+
 def create_app(test_config=None):
-  # create and configure the app
-  app = Flask(__name__)
-  setup_db(app)
-  
-  '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-  '''
+    # create and configure the app
+    app = Flask(__name__)
+    setup_db(app)
 
-  '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
+    CORS(app)
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  '''
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+        return response
 
+    @app.route('/categories')
+    def get_categories():
+        categories = Category.query.all()
+        return jsonify({
+            'categories': [c.format() for c in categories]
+        })
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+    '''
+    get_questions returns paginated list of questions
+    '''
+    @app.route('/questions')
+    def get_questions():
+        per_page = 10
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * per_page
+        stop = start + per_page - 1
+        questions = Question.query.slice(start, stop).all()
+        total_questions = Question.query.count()
+        categories = Category.query.all()
+        return jsonify({
+            'questions': [q.format() for q in questions],
+            'total_questions': total_questions,
+            'per_page': per_page,
+            'page': page,
+            'categories': {c.id: c.type for c in categories},
+            'current_category': None
+        })
 
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
-  '''
-
-  '''
+    '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
 
@@ -49,7 +60,7 @@ def create_app(test_config=None):
   This removal will persist in the database and when you refresh the page. 
   '''
 
-  '''
+    '''
   @TODO: 
   Create an endpoint to POST a new question, 
   which will require the question and answer text, 
@@ -60,7 +71,7 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.  
   '''
 
-  '''
+    '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
   It should return any questions for whom the search term 
@@ -71,7 +82,7 @@ def create_app(test_config=None):
   Try using the word "title" to start. 
   '''
 
-  '''
+    '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
 
@@ -79,9 +90,7 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
-
-
-  '''
+    '''
   @TODO: 
   Create a POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
@@ -93,12 +102,10 @@ def create_app(test_config=None):
   and shown whether they were correct or not. 
   '''
 
-  '''
+    '''
   @TODO: 
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
-  
-  return app
 
-    
+    return app
