@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import '../stylesheets/Header.css';
 
 class Header extends Component {
@@ -9,10 +10,18 @@ class Header extends Component {
   render() {
     return (
       <div className="App-header">
-        <h1 onClick={() => this.navTo('')}>Udacitrivia</h1>
-        <h2 onClick={() => this.navTo('')}>List</h2>
-        <h2 onClick={() => this.navTo('/add')}>Add</h2>
-        <h2 onClick={() => this.navTo('/play')}>Play</h2>
+        <Link to="/">
+          <h1>Udacitrivia</h1>
+        </Link>
+        <Link to="/">
+          <h2>List</h2>
+        </Link>
+        <Link to="/add">
+          <h2>Add</h2>
+        </Link>
+        <Link to="/play">
+          <h2>Play</h2>
+        </Link>
       </div>
     );
   }

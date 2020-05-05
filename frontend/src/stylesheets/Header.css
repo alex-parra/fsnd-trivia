@@ -1,0 +1,30 @@
+.App-header {
+  background-color: #222;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 75px;
+  padding: 20px;
+  padding-right: 40%;
+  padding-left: 5%;
+}
+
+.App-header h1 {
+  margin: 0;
+  color: dodgerblue;
+}
+
+.App-header h2 {
+  margin: 0;
+}
+
+.App-header a {
+  color: inherit;
+  text-decoration: none;
+  padding: 1em 2em;
+}
+
+.App-header a:hover {
+  color: dodgerblue;
+}
