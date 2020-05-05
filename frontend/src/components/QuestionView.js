@@ -64,6 +64,10 @@ class QuestionView extends Component {
     return pageNumbers;
   }
 
+  showAll = () => {
+    this.setState({ currentCategory: null }, this.getQuestions);
+  };
+
   getByCategory = async (id) => {
     try {
       const data = await api.getCategoryQuestions(id);
@@ -118,12 +122,19 @@ class QuestionView extends Component {
     return (
       <div className="question-view">
         <div className="categories-list">
-          <h2 onClick={() => this.getQuestions()}>Categories</h2>
+          <h2>Categories</h2>
           <ul>
+            <li>
+              <a href="#0" onClick={(ev) => (ev.preventDefault(), this.showAll())}>
+                All Categories
+              </a>
+            </li>
             {Object.keys(this.state.categories).map((id) => (
-              <li key={id} onClick={() => this.getByCategory(id)}>
-                {this.state.categories[id]}
-                <img className="category" src={`${this.state.categories[id]}.svg`} alt="" />
+              <li key={id}>
+                <a href="#0" onClick={(ev) => (ev.preventDefault(), this.getByCategory(id))}>
+                  {this.state.categories[id]}
+                  <img className="category" src={`${this.state.categories[id]}.svg`} alt="" />
+                </a>
               </li>
             ))}
           </ul>

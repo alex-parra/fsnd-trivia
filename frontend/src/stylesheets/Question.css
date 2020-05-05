@@ -6,10 +6,31 @@
 .categories-list {
   flex-basis: 25%;
   flex-shrink: 2;
+  padding: 0 20px;
 }
 
 .categories-list > form {
   width: 60%;
+}
+
+.categories-list a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  padding: 0.4em 1em;
+  border-radius: 3px;
+  text-decoration: none;
+}
+
+.categories-list a:hover {
+  background-color: #eee;
+}
+
+.categories-list img.category {
+  order: -1;
+  margin-right: 0.5em;
+  width: 1.25em;
 }
 
 .questions-list {
