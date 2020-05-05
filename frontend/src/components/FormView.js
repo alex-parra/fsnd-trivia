@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import api from '../api';
-import $ from 'jquery';
-
 import '../stylesheets/FormView.css';
 
 class FormView extends Component {
   constructor(props) {
     super();
     this.state = {
-      question: '',
-      answer: '',
-      difficulty: 1,
-      category: 1,
       categories: {},
+      form: {
+        question: '',
+        answer: '',
+        difficulty: 1,
+        category: 1,
+      },
     };
   }
 
@@ -21,74 +21,58 @@ class FormView extends Component {
     this.setState({ categories });
   }
 
-  submitQuestion = (event) => {
-    event.preventDefault();
-    $.ajax({
-      url: '/questions', //TODO: update request URL
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      data: JSON.stringify({
-        question: this.state.question,
-        answer: this.state.answer,
-        difficulty: this.state.difficulty,
-        category: this.state.category,
-      }),
-      xhrFields: {
-        withCredentials: true,
-      },
-      crossDomain: true,
-      success: (result) => {
-        document.getElementById('add-question-form').reset();
-        return;
-      },
-      error: (error) => {
-        alert('Unable to add question. Please try your request again');
-        return;
-      },
-    });
+  submitQuestion = async (ev) => {
+    ev.preventDefault();
+    try {
+      await api.addQuestion(this.state.form);
+      this.props.history.replace('/');
+    } catch {
+      alert('Unable to add question. Please try your request again');
+    }
   };
 
   handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    this.setState((state) => ({ form: { ...state.form, [name]: value } }));
   };
 
   render() {
+    const difficulties = [1, 2, 3, 4, 5];
+    const categIds = Object.keys(this.state.categories);
+
     return (
       <div id="add-form">
         <h2>Add a New Trivia Question</h2>
         <form className="form-view" id="add-question-form" onSubmit={this.submitQuestion}>
           <label>
-            Question
-            <input type="text" name="question" onChange={this.handleChange} />
+            <strong>Question:</strong> <input type="text" name="question" onChange={this.handleChange} autoFocus />
           </label>
           <label>
-            Answer
-            <input type="text" name="answer" onChange={this.handleChange} />
+            <strong>Answer:</strong> <input type="text" name="answer" onChange={this.handleChange} />
           </label>
           <label>
-            Difficulty
+            <strong>Difficulty:</strong>
             <select name="difficulty" onChange={this.handleChange}>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
+              {difficulties.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
             </select>
           </label>
           <label>
-            Category
+            <strong>Category:</strong>
             <select name="category" onChange={this.handleChange}>
-              {Object.keys(this.state.categories).map((id) => {
-                return (
-                  <option key={id} value={id}>
-                    {this.state.categories[id]}
-                  </option>
-                );
-              })}
+              {categIds.map((id) => (
+                <option key={id} value={id}>
+                  {this.state.categories[id]}
+                </option>
+              ))}
             </select>
           </label>
-          <input type="submit" className="button" value="Submit" />
+          <button type="submit" className="button">
+            Save Question
+          </button>
         </form>
       </div>
     );

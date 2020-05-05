@@ -1,22 +1,19 @@
 .App-header {
-  background-color: #222;
+  background-color: #1b5a98;
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  min-height: 75px;
-  padding: 20px;
-  padding-right: 40%;
-  padding-left: 5%;
+  padding: 10px 20px;
 }
 
 .App-header h1 {
   margin: 0;
-  color: dodgerblue;
+  color: #fff;
 }
 
 .App-header h2 {
   margin: 0;
+  font-weight: 300;
 }
 
 .App-header a {
@@ -26,5 +23,10 @@
 }
 
 .App-header a:hover {
-  color: dodgerblue;
+  opacity: 0.8;
+}
+
+.App-header > a:first-child {
+  padding-left: 0;
+  padding-right: 4em;
 }

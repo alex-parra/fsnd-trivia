@@ -1,7 +1,36 @@
-.form-view > label {
-  padding: 0px 0px 10px;
+#add-form {
+  padding: 0 40px;
 }
 
-#add-form {
-  text-align: center;
+.form-view > label {
+  padding: 0px 0px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.form-view > label > strong {
+  flex: 0 0 auto;
+  width: 25%;
+  min-width: 120px;
+}
+
+.form-view input,
+.form-view select {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 3px;
+  font-size: 16px;
+  padding: 0.3em 0.5em;
+}
+
+.form-view input {
+  appearance: none;
+}
+
+.form-view button[type='submit'] {
+  display: table;
+  margin: 20px auto;
 }
