@@ -31,7 +31,7 @@ def create_app(test_config=None):
     def get_categories():
         categories = Category.query.all()
         return jsonify({
-            'categories': [c.format() for c in categories]
+            'categories': {c.id: c.type for c in categories}
         })
 
     '''

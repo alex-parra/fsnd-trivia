@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import api from '../api';
 import $ from 'jquery';
 
 import '../stylesheets/QuizView.css';
@@ -20,19 +21,9 @@ class QuizView extends Component {
     };
   }
 
-  componentDidMount() {
-    $.ajax({
-      url: `/categories`, //TODO: update request URL
-      type: 'GET',
-      success: (result) => {
-        this.setState({ categories: result.categories });
-        return;
-      },
-      error: (error) => {
-        alert('Unable to load categories. Please try your request again');
-        return;
-      },
-    });
+  async componentDidMount() {
+    const { categories = {} } = await api.getCategories().catch(() => ({}));
+    this.setState({ categories });
   }
 
   selectCategory = ({ type, id = 0 }) => {
