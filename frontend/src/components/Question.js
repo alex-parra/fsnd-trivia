@@ -14,20 +14,25 @@ class Question extends Component {
   }
 
   render() {
-    const { question, answer, category, difficulty } = this.props;
+    const { question, category } = this.props;
     return (
       <div className="Question-holder">
-        <div className="Question">{question}</div>
-        <div className="Question-status">
-          <img className="category" src={`${category}.svg`} alt="" />
-          <div className="difficulty">Difficulty: {difficulty}</div>
-          <img src="delete.png" alt="" className="delete" onClick={() => this.props.questionAction('DELETE')} />
+        <div className="infos">
+          <div className="category">
+            <img src={`${category}.svg`} alt="" />
+            <span>{category}</span>
+          </div>
+          <div className="difficulty">Difficulty: {question.difficulty}</div>
+          <img src="delete.png" alt="" className="delete" onClick={() => this.props.action('DELETE')} />
         </div>
-        <div className="show-answer button" onClick={() => this.flipVisibility()}>
-          {this.state.visibleAnswer ? 'Hide' : 'Show'} Answer
-        </div>
+
+        <h3 className="Question">{question.question}</h3>
+
         <div className="answer-holder">
-          <span style={{ visibility: this.state.visibleAnswer ? 'visible' : 'hidden' }}>Answer: {answer}</span>
+          <button className="show-answer button" onClick={() => this.flipVisibility()}>
+            {this.state.visibleAnswer ? 'Hide' : 'Show'} Answer
+          </button>
+          <span style={{ visibility: this.state.visibleAnswer ? 'visible' : 'hidden' }}>Answer: {question.answer}</span>
         </div>
       </div>
     );

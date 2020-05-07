@@ -136,7 +136,7 @@ class QuestionView extends Component {
             <Search value={this.state.search} onChange={this.setSearch} submitSearch={this.submitSearch} />
           </div>
           {this.state.questions.map((q, ind) => (
-            <Question key={q.id} question={q.question} answer={q.answer} category={this.state.categories[q.category]} difficulty={q.difficulty} questionAction={this.questionAction(q.id)} />
+            <Question key={q.id} question={q} category={this.state.categories[q.category]} action={this.questionAction(q.id)} />
           ))}
           <div className="pagination-menu">{this.createPagination()}</div>
         </div>
