@@ -29,7 +29,8 @@ def create_app(test_config=None):
     '''
     @app.route('/categories')
     def get_categories():
-        categories = Category.query.all()
+        categories = Category.query.order_by(
+            Category.id.asc()).all()
         return jsonify({
             'categories': {c.id: c.type for c in categories}
         })
@@ -43,7 +44,8 @@ def create_app(test_config=None):
         page = request.args.get('page', 1, type=int)
         start = (page - 1) * per_page
         stop = start + per_page - 1
-        questions = Question.query.slice(start, stop).all()
+        questions = Question.query.order_by(
+            Question.id.asc()).slice(start, stop).all()
         total_questions = Question.query.count()
         categories = Category.query.all()
         return jsonify({
@@ -93,7 +95,8 @@ def create_app(test_config=None):
         if categ_id != None:
             filters = [Question.category == categ_id] + filters
 
-        questions = Question.query.filter(*filters).all()
+        questions = Question.query.order_by(
+            Question.id.asc()).filter(*filters).all()
         return jsonify({
             'questions': [q.format() for q in questions],
         })
@@ -107,7 +110,8 @@ def create_app(test_config=None):
         page = request.args.get('page', 1, type=int)
         start = (page - 1) * per_page
         stop = start + per_page - 1
-        questions = Question.query.filter(
+        questions = Question.query.order_by(
+            Question.id.asc()).filter(
             Question.category == category_id).slice(start, stop).all()
         total_questions = Question.query.filter(
             Question.category == category_id).count()
