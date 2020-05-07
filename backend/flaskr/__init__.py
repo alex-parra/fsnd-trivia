@@ -3,6 +3,8 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+from flask_jsonschema_validator import JSONSchemaValidator
+import jsonschema
 
 from models import setup_db, db, Question, Category
 
@@ -15,6 +17,7 @@ def create_app(test_config=None):
     setup_db(app)
 
     CORS(app)
+    JSONSchemaValidator(app=app, root="schemas")
 
     @app.after_request
     def after_request(response):
@@ -73,9 +76,9 @@ def create_app(test_config=None):
     Create question
     '''
     @app.route('/questions', methods=['POST'])
+    @app.validate('question', 'create')
     def add_question():
         data = request.get_json(force=True)
-        # TODO: Validation with marshmallow
         fields = ('question', 'answer', 'category', 'difficulty')
         question = Question(**{k: data[k] for k in fields if k in data})
         db.session.add(question)
@@ -144,10 +147,14 @@ def create_app(test_config=None):
 
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({error: 'Not Found'}), 404
+        return jsonify({'error': 'Not Found'}), 404
 
     @app.errorhandler(422)
     def bad_request(error):
-        return jsonify({error: 'Bad request or data'}), 422
+        return jsonify({'error': 'Bad request or data'}), 422
+
+    @app.errorhandler(jsonschema.ValidationError)
+    def onValidationError(e):
+        return jsonify({'error': "There was a validation error: " + str(e)}), 400
 
     return app

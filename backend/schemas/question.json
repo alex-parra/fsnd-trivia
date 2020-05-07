@@ -1,0 +1,12 @@
+{
+  "create": {
+    "type": "object",
+    "properties": {
+      "question": { "type": "string", "minLength": 10 },
+      "answer": { "type": "string", "minLength": 1 },
+      "difficulty": { "type": "number" },
+      "category": { "type": "number" }
+    },
+    "required": ["question", "answer", "difficulty", "category"]
+  }
+}

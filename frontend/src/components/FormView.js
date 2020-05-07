@@ -26,8 +26,8 @@ class FormView extends Component {
     try {
       await api.addQuestion(this.state.form);
       this.props.history.replace('/');
-    } catch {
-      alert('Unable to add question. Please try your request again');
+    } catch (response) {
+      alert('Unable to add question.\n' + response.error);
     }
   };
 
