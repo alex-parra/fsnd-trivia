@@ -81,15 +81,22 @@ def create_app(test_config=None):
         return jsonify(question.format())
 
     '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
+    Search Questions
+    '''
+    @app.route('/questions/searches', methods=['POST'])
+    def search_questions():
+        data = request.get_json(force=True)
+        search = data.get('searchTerm')
+        filters = [Question.question.ilike("%{}%".format(search))]
 
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
+        categ_id = data.get('categoryId')
+        if categ_id != None:
+            filters = [Question.category == categ_id] + filters
+
+        questions = Question.query.filter(*filters).all()
+        return jsonify({
+            'questions': [q.format() for q in questions],
+        })
 
     '''
     Get paginated questions of specified category

@@ -41,4 +41,11 @@ export default {
     if (!r.ok) throw new Error('Failed to fetch questions');
     return r.json();
   },
+
+  searchQuestions: async (searchTerm = '', categoryId = null) => {
+    const data = { searchTerm, categoryId };
+    const r = await fetch(`${API}/questions/searches`, postJson(data)).catch(() => ({ ok: false }));
+    if (!r.ok) throw new Error('Failed to search questions');
+    return r.json();
+  },
 };

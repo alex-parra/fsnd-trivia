@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import '../stylesheets/App.css';
 import Question from './Question';
 import Search from './Search';
-import $ from 'jquery';
 import api from '../api';
 
 class QuestionView extends Component {
@@ -16,6 +15,7 @@ class QuestionView extends Component {
       totalQuestions: 0,
       categories: {},
       currentCategory: null,
+      search: '',
     };
   }
 
@@ -75,36 +75,27 @@ class QuestionView extends Component {
         questions: data.questions,
         totalQuestions: data.total_questions,
         currentCategory: data.current_category,
+        search: '',
       });
     } catch {
       alert('Unable to load questions. Please try your request again');
     }
   };
 
-  submitSearch = (searchTerm) => {
-    $.ajax({
-      url: `/questions`, //TODO: update request URL
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      data: JSON.stringify({ searchTerm: searchTerm }),
-      xhrFields: {
-        withCredentials: true,
-      },
-      crossDomain: true,
-      success: (result) => {
-        this.setState({
-          questions: result.questions,
-          totalQuestions: result.total_questions,
-          currentCategory: result.current_category,
-        });
-        return;
-      },
-      error: (error) => {
-        alert('Unable to load questions. Please try your request again');
-        return;
-      },
-    });
+  setSearch = (searchTerm) => {
+    this.setState({ search: searchTerm });
+  };
+
+  submitSearch = async () => {
+    try {
+      const data = await api.searchQuestions(this.state.search, this.state.currentCategory);
+      this.setState({
+        questions: data.questions,
+        totalQuestions: data.questions.length,
+      });
+    } catch {
+      alert('Unable to load questions. Please try your request again');
+    }
   };
 
   questionAction = (id) => (action) => {
@@ -124,13 +115,13 @@ class QuestionView extends Component {
         <div className="categories-list">
           <h2>Categories</h2>
           <ul>
-            <li>
+            <li className={!this.state.currentCategory ? 'active' : ''}>
               <a href="#0" onClick={(ev) => (ev.preventDefault(), this.showAll())}>
                 All Categories
               </a>
             </li>
             {Object.keys(this.state.categories).map((id) => (
-              <li key={id}>
+              <li key={id} className={Number(id) === this.state.currentCategory ? 'active' : ''}>
                 <a href="#0" onClick={(ev) => (ev.preventDefault(), this.getByCategory(id))}>
                   {this.state.categories[id]}
                   <img className="category" src={`${this.state.categories[id]}.svg`} alt="" />
@@ -138,10 +129,12 @@ class QuestionView extends Component {
               </li>
             ))}
           </ul>
-          <Search submitSearch={this.submitSearch} />
         </div>
         <div className="questions-list">
-          <h2>Questions</h2>
+          <div className="header">
+            <h2>Questions</h2>
+            <Search value={this.state.search} onChange={this.setSearch} submitSearch={this.submitSearch} />
+          </div>
           {this.state.questions.map((q, ind) => (
             <Question key={q.id} question={q.question} answer={q.answer} category={this.state.categories[q.category]} difficulty={q.difficulty} questionAction={this.questionAction(q.id)} />
           ))}
