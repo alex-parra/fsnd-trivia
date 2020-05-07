@@ -5,20 +5,20 @@ import $ from 'jquery';
 import '../stylesheets/QuizView.css';
 
 const questionsPerPlay = 5;
+const initialState = {
+  quizCategory: null,
+  previousQuestions: [],
+  showAnswer: false,
+  numCorrect: 0,
+  currentQuestion: null,
+  guess: '',
+  forceEnd: false,
+};
 
 class QuizView extends Component {
   constructor(props) {
     super();
-    this.state = {
-      quizCategory: null,
-      previousQuestions: [],
-      showAnswer: false,
-      categories: {},
-      numCorrect: 0,
-      currentQuestion: {},
-      guess: '',
-      forceEnd: false,
-    };
+    this.state = { ...initialState };
   }
 
   async componentDidMount() {
@@ -26,53 +26,38 @@ class QuizView extends Component {
     this.setState({ categories });
   }
 
-  selectCategory = ({ type, id = 0 }) => {
-    this.setState({ quizCategory: { type, id } }, this.getNextQuestion);
+  selectCategory = (ev, { id, label }) => {
+    ev.preventDefault();
+    const quizCategory = { id, type: label };
+    this.setState({ quizCategory }, this.getNextQuestion);
   };
 
   handleChange = (event) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  getNextQuestion = () => {
-    const previousQuestions = [...this.state.previousQuestions];
-    if (this.state.currentQuestion.id) {
-      previousQuestions.push(this.state.currentQuestion.id);
-    }
+  getNextQuestion = async () => {
+    const previousQuestions = this.state.previousQuestions.slice();
+    const { currentQuestion, quizCategory } = this.state;
+    if (currentQuestion) previousQuestions.push(currentQuestion.id);
 
-    $.ajax({
-      url: '/quizzes', //TODO: update request URL
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      data: JSON.stringify({
-        previous_questions: previousQuestions,
-        quiz_category: this.state.quizCategory,
-      }),
-      xhrFields: {
-        withCredentials: true,
-      },
-      crossDomain: true,
-      success: (result) => {
-        this.setState({
-          showAnswer: false,
-          previousQuestions: previousQuestions,
-          currentQuestion: result.question,
-          guess: '',
-          forceEnd: result.question ? false : true,
-        });
-        return;
-      },
-      error: (error) => {
-        alert('Unable to load question. Please try your request again');
-        return;
-      },
-    });
+    try {
+      const categId = Number(quizCategory.id) || null;
+      const data = await api.quizNextQuestion({ previousQuestions, quizCategory: categId });
+      this.setState({
+        showAnswer: false,
+        previousQuestions,
+        currentQuestion: data.question,
+        guess: '',
+        forceEnd: data.question ? false : true,
+      });
+    } catch {
+      alert('Unable to load question. Please try your request again');
+    }
   };
 
   submitGuess = (event) => {
     event.preventDefault();
-    // const formatGuess = this.state.guess.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '').toLowerCase();
     let evaluate = this.evaluateAnswer();
     this.setState({
       numCorrect: !evaluate ? this.state.numCorrect : this.state.numCorrect + 1,
@@ -81,30 +66,20 @@ class QuizView extends Component {
   };
 
   restartGame = () => {
-    this.setState({
-      quizCategory: null,
-      previousQuestions: [],
-      showAnswer: false,
-      numCorrect: 0,
-      currentQuestion: {},
-      guess: '',
-      forceEnd: false,
-    });
+    this.setState({ ...initialState });
   };
 
   renderPrePlay() {
+    const categories = { '0': 'ALL', ...this.state.categories };
     return (
       <div className="quiz-play-holder">
         <div className="choose-header">Choose Category</div>
         <div className="category-holder">
-          <div className="play-category" onClick={this.selectCategory}>
-            ALL
-          </div>
-          {Object.keys(this.state.categories).map((id) => {
+          {Object.entries(categories).map(([id, label]) => {
             return (
-              <div key={id} value={id} className="play-category" onClick={() => this.selectCategory({ type: this.state.categories[id], id })}>
-                {this.state.categories[id]}
-              </div>
+              <a href="#0" key={id} className="play-category" onClick={(ev) => this.selectCategory(ev, { id, label })}>
+                {label}
+              </a>
             );
           })}
         </div>
@@ -115,10 +90,14 @@ class QuizView extends Component {
   renderFinalScore() {
     return (
       <div className="quiz-play-holder">
-        <div className="final-header"> Your Final Score is {this.state.numCorrect}</div>
-        <div className="play-again button" onClick={this.restartGame}>
-          {' '}
-          Play Again?{' '}
+        <div className="final-header">
+          Your Final Score is
+          <strong>{this.state.numCorrect}</strong>
+        </div>
+        <div>
+          <button className="play-again button" onClick={this.restartGame}>
+            Play Again?
+          </button>
         </div>
       </div>
     );
@@ -126,20 +105,22 @@ class QuizView extends Component {
 
   evaluateAnswer = () => {
     const formatGuess = this.state.guess.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '').toLowerCase();
-    const answerArray = this.state.currentQuestion.answer.toLowerCase().split(' ');
-    return answerArray.includes(formatGuess);
+    return formatGuess === this.state.currentQuestion.answer.toLowerCase();
   };
 
   renderCorrectAnswer() {
-    // const formatGuess = this.state.guess.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '').toLowerCase();
     let evaluate = this.evaluateAnswer();
     return (
       <div className="quiz-play-holder">
         <div className="quiz-question">{this.state.currentQuestion.question}</div>
-        <div className={`${evaluate ? 'correct' : 'wrong'}`}>{evaluate ? 'You were correct!' : 'You were incorrect'}</div>
-        <div className="quiz-answer">{this.state.currentQuestion.answer}</div>
-        <div className="next-question button" onClick={this.getNextQuestion}>
-          Next Question
+        <div className="quiz-answer">
+          The answer is <br /> <strong>{this.state.currentQuestion.answer}</strong>
+        </div>
+        <div className={`answer-result ${evaluate ? 'correct' : 'wrong'}`}>{evaluate ? 'You were correct!' : 'You were incorrect'}</div>
+        <div>
+          <button className="next-question" onClick={this.getNextQuestion}>
+            Next Question
+          </button>
         </div>
       </div>
     );
@@ -150,12 +131,16 @@ class QuizView extends Component {
       this.renderFinalScore()
     ) : this.state.showAnswer ? (
       this.renderCorrectAnswer()
+    ) : this.state.currentQuestion == null ? (
+      <div className="loading">Loading...</div>
     ) : (
       <div className="quiz-play-holder">
         <div className="quiz-question">{this.state.currentQuestion.question}</div>
-        <form onSubmit={this.submitGuess}>
-          <input type="text" name="guess" onChange={this.handleChange} />
-          <input className="submit-guess button" type="submit" value="Submit Answer" />
+        <form onSubmit={this.submitGuess} autoComplete="off">
+          <input type="text" name="guess" placeholder="Enter your answer..." onChange={this.handleChange} autoFocus autoComplete="off" />
+          <button className="submit-guess button" type="submit">
+            Submit Answer
+          </button>
         </form>
       </div>
     );

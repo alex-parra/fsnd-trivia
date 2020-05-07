@@ -7,10 +7,10 @@ const getJson = () => ({
   headers: { ...acceptJson },
 });
 
-const postJson = (data) => ({
+const postJson = (payload) => ({
   method: 'POST',
   headers: { ...acceptJson },
-  body: JSON.stringify(data),
+  body: JSON.stringify(payload),
 });
 
 export default {
@@ -26,8 +26,8 @@ export default {
     return r.json();
   },
 
-  addQuestion: async (data) => {
-    const r = await fetch(`${API}/questions`, postJson(data)).catch(() => ({ ok: false }));
+  addQuestion: async (payload) => {
+    const r = await fetch(`${API}/questions`, postJson(payload)).catch(() => ({ ok: false }));
     if (!r.ok) throw new Error('Failed to add question');
     return r.json();
   },
@@ -43,9 +43,15 @@ export default {
   },
 
   searchQuestions: async (searchTerm = '', categoryId = null) => {
-    const data = { searchTerm, categoryId };
-    const r = await fetch(`${API}/questions/searches`, postJson(data)).catch(() => ({ ok: false }));
+    const payload = { searchTerm, categoryId };
+    const r = await fetch(`${API}/questions/searches`, postJson(payload)).catch(() => ({ ok: false }));
     if (!r.ok) throw new Error('Failed to search questions');
+    return r.json();
+  },
+
+  quizNextQuestion: async (payload) => {
+    const r = await fetch(`${API}/quizzes`, postJson(payload)).catch(() => ({ ok: false }));
+    if (!r.ok) throw new Error('Failed to get quiz question');
     return r.json();
   },
 };
