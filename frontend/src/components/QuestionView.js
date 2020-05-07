@@ -66,11 +66,13 @@ class QuestionView extends Component {
     return pageNumbers;
   }
 
-  showAll = () => {
-    this.setState({ currentCategory: null }, this.getQuestions);
-  };
+  getByCategory = async (ev, id) => {
+    ev.preventDefault();
 
-  getByCategory = async (id) => {
+    if (!id) {
+      return this.setState({ currentCategory: null }, this.getQuestions);
+    }
+
     try {
       const data = await api.getCategoryQuestions(id);
       this.setState({
@@ -112,25 +114,22 @@ class QuestionView extends Component {
   };
 
   render() {
+    const categories = [
+      { id: 0, label: 'All Categories' },
+      ...Object.entries(this.state.categories)
+        .map(([id, label]) => ({ id: Number(id), label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    ];
+
     return (
       <div className="question-view">
         <div className="categories-list">
           <h2>Categories</h2>
-          <ul>
-            <li className={!this.state.currentCategory ? 'active' : ''}>
-              <a href="#0" onClick={(ev) => (ev.preventDefault(), this.showAll())}>
-                All Categories
-              </a>
-            </li>
-            {Object.keys(this.state.categories).map((id) => (
-              <li key={id} className={Number(id) === this.state.currentCategory ? 'active' : ''}>
-                <a href="#0" onClick={(ev) => (ev.preventDefault(), this.getByCategory(id))}>
-                  {this.state.categories[id]}
-                  <img className="category" src={`${this.state.categories[id]}.svg`} alt="" />
-                </a>
-              </li>
-            ))}
-          </ul>
+          {categories.map(({ id, label }) => (
+            <a key={id} className={id === this.state.currentCategory ? 'active' : ''} href="#0" onClick={(ev) => this.getByCategory(ev, id)}>
+              {label} {id > 0 && <img className="category" src={`${label}.svg`} alt="" />}
+            </a>
+          ))}
         </div>
         <div className="questions-list">
           <div className="header">

@@ -23,7 +23,7 @@
   text-decoration: none;
 }
 
-.categories-list .active a,
+.categories-list a.active,
 .categories-list a:hover {
   background-color: #eee;
 }
