@@ -7,12 +7,17 @@
 3. init virtual env: `python3 -m venv env`
 4. activate venv: `source ./env/bin/activate`
 5. install backend dependencies: `python3 -m pip install -r requirements.txt`
-6. start postgres container: `docker-compose up`
+6. start postgres container: `docker-compose up -d`
 7. seed the database: `sh boot.sh db-seed`
 8. start flask: `sh boot.sh dev`
 9. cd out of `backend` and into `frontend`
 10. install frontend dependencies: `npm run install`
 11. start frontend: `npm run start`
+
+## Run tests
+
+1. seed test db: `sh boot.sh db-test-seed`
+2. run tests: `sh boot.sh test`
 
 ---
 
