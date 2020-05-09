@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import api from '../api';
-import $ from 'jquery';
 
 import '../stylesheets/QuizView.css';
 
