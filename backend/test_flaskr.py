@@ -3,7 +3,7 @@ import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
 
-from flaskr import create_app
+from flaskr import create_app, paginate
 from models import setup_db, Question, Category
 
 
@@ -27,6 +27,20 @@ class TriviaTestCase(unittest.TestCase):
     def tearDown(self):
         '''Executed after each test'''
         pass
+
+    def test_paginate(self):
+        (start, stop, per_page) = paginate(1)
+        self.assertEqual(start, 0)
+        self.assertEqual(stop, start + per_page - 1)
+
+        (start, stop, per_page) = paginate(2)
+        self.assertEqual(start, per_page)
+        self.assertEqual(stop, start + per_page - 1)
+
+        (start, stop, per_page) = paginate(1, 20)
+        self.assertEqual(start, 0)
+        self.assertEqual(stop, 19)
+        self.assertEqual(per_page, 20)
 
     def test_get_categories(self):
         '''Test get_categories '''

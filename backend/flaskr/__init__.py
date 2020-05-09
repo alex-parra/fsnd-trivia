@@ -11,6 +11,13 @@ from models import setup_db, db, Question, Category
 QUESTIONS_PER_PAGE = 10
 
 
+def paginate(page, per_page=10):
+    '''Calculate select start and end from page and per_page'''
+    start = (page - 1) * per_page
+    stop = start + per_page - 1
+    return (start, stop, per_page)
+
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -39,10 +46,8 @@ def create_app(test_config=None):
     @app.route('/questions')
     def get_questions():
         '''Get questions paginated'''
-        per_page = 10
         page = request.args.get('page', 1, type=int)
-        start = (page - 1) * per_page
-        stop = start + per_page - 1
+        (start, stop, per_page) = paginate(page)
         questions = Question.query.order_by(
             Question.id.asc()).slice(start, stop).all()
         total_questions = Question.query.count()
@@ -97,10 +102,8 @@ def create_app(test_config=None):
     @app.route('/category/<int:category_id>/questions')
     def get_category_questions(category_id):
         '''Get paginated questions of specified category'''
-        per_page = 10
         page = request.args.get('page', 1, type=int)
-        start = (page - 1) * per_page
-        stop = start + per_page - 1
+        (start, stop, per_page) = paginate(page)
 
         categ = Category.query.get(category_id)
         if categ is None:
