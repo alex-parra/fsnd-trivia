@@ -92,9 +92,11 @@ class TriviaTestCase(unittest.TestCase):
         test_question = {'question': 'Test Question',
                          'answer': 'Test Answer', 'difficulty': 1, 'category': 1}
         res = self.client().post('/questions', json=test_question)
-        resDelete = self.client().delete('/questions/{}'.format(res.json.get('id')))
+        id = res.json.get('id')
+        resDelete = self.client().delete('/questions/{}'.format(id))
         self.assertEqual(res.status_code, 200)
         self.assertEqual(resDelete.json.get('success'), True)
+        self.assertEqual(resDelete.json.get('id'), id)
 
     def test_delete_question_404(self):
         '''Test delete_question 404'''
