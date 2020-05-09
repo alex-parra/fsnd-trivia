@@ -56,16 +56,6 @@ def create_app(test_config=None):
             'current_category': None
         })
 
-    @app.route('/questions/<int:question_id>', methods=['DELETE'])
-    def delete_question(question_id):
-        '''Delete a question by it's ID'''
-        question = Question.query.get(question_id)
-        if question is None:
-            return abort(404)
-        db.session.delete(question)
-        db.session.commit()
-        return jsonify({'success': True})
-
     @app.route('/questions', methods=['POST'])
     @app.validate('question', 'create')
     def add_question():
@@ -77,6 +67,16 @@ def create_app(test_config=None):
         db.session.commit()
         return jsonify(question.format())
 
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+        '''Delete a question by it's ID'''
+        question = Question.query.get(question_id)
+        if question is None:
+            return abort(404)
+        db.session.delete(question)
+        db.session.commit()
+        return jsonify({'success': True, 'id': question.id})
+
     @app.route('/questions/searches', methods=['POST'])
     def search_questions():
         '''Search Questions'''
@@ -85,7 +85,7 @@ def create_app(test_config=None):
         filters = [Question.question.ilike("%{}%".format(search))]
 
         categ_id = data.get('categoryId')
-        if categ_id != None:
+        if categ_id:
             filters = [Question.category == categ_id] + filters
 
         questions = Question.query.order_by(
@@ -125,7 +125,7 @@ def create_app(test_config=None):
         data = request.get_json(force=True)
         filters = [Question.id.notin_(data.get('previousQuestions'))]
         categ_id = data.get('quizCategory')
-        if categ_id != None:
+        if categ_id:
             filters = [Question.category == categ_id] + filters
         questions = Question.query.filter(*filters).all()
         question = None

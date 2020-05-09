@@ -19,6 +19,179 @@
 1. seed test db: `sh boot.sh db-test-seed`
 2. run tests: `sh boot.sh test`
 
+## API Endpoints
+
+`GET /questions`  
+Get list of questions, paginated
+
+**Request Params**
+
+- `page`: `int`
+
+**Response JSON**
+
+```js
+{
+  "questions": [] // list of question DTOs
+  "total_questions": int // total questions in db
+  "per_page": int // page size
+  "page": int // page returned
+  "categories": {} // dict of 'id': 'title' pairs
+  "current_category": null // always null
+}
+```
+
+---
+
+`POST /questions`  
+Create a question in the db
+
+**Request Params**
+
+- _No query params supported_
+
+**Request Body (JSON)**
+
+```js
+{
+  "question": string // the question to be asked
+  "answer": string // the correct answer
+  "category": int // the category id the question belongs to
+  "difficulty": int // the difficulty level [1 - 5]
+}
+```
+
+**Response JSON**
+
+```js
+{
+  // See Question DTO
+}
+```
+
+---
+
+`DELETE /questions/<id>`  
+Delete a question from the db
+
+**Request Params**
+
+- _No query params supported_
+
+**Response JSON**
+
+```js
+{
+  "success": boolean
+  "id": int // id of question deleted
+}
+```
+
+---
+
+`POST /questions/searches`  
+Search questions by 'question' content
+
+**Request Params**
+
+- _No query params supported_
+
+**Request Body (JSON)**
+
+```js
+{
+  "searchTerm": string // the text entered by the user
+  "categoryId": int // narrow search to questions of this category
+}
+```
+
+**Response JSON**
+
+```js
+{
+  "questions": [] // list of question DTOs
+}
+```
+
+---
+
+`GET /categories`  
+Get all categories in the system.
+
+**Request Params**
+
+- _No query params supported_
+
+**Response JSON**
+
+```js
+{
+  "categories": {} // dict of 'id': 'title' pairs
+}
+```
+
+---
+
+`GET /category/<id>/questions`  
+Get list of questions, paginated and belonging to specified category
+
+**Request Params**
+
+- `page`: `int`
+
+**Response JSON**
+
+```js
+{
+  "questions": [] // list of question DTOs
+  "total_questions": int // total questions in db
+  "per_page": int // page size
+  "page": int // page returned
+  "current_category": int // id of cagtegory specified
+}
+```
+
+---
+
+`POST /quizzes`  
+Get next question for quiz
+
+**Request Params**
+
+- _No query params supported_
+
+**Request Body (JSON)**
+
+```js
+{
+  "previousQuestions": [] // list of question ids already answered
+  "quizCategory": int // narrow search to questions of this category
+}
+```
+
+**Response JSON**
+
+```js
+{
+  "question": {} || null // question DTO or null if no more questions exist
+}
+```
+
+---
+
+## DTOs - Data Transfer Objects
+
+```js
+// Question DTO
+{
+  "id": int // id of the created question
+  "question": string // the question to be asked
+  "answer": string // the correct answer
+  "category": int // the category id the question belongs to
+  "difficulty": int // the difficulty level [1 - 5]
+}
+```
+
 ---
 
 ## Full Stack Trivia
